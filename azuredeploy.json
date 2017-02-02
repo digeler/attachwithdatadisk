@@ -4,63 +4,73 @@
   "parameters": {
     "vmSize": {
       "type": "string",
+      "defaultValue": "Standard_A1",
       "metadata": {
         "description": "This is the size of your VM"
       }
     },
     "vnetname": {
       "type": "string",
+      "defaultValue": "dcos-vnet-292023AF",
       "metadata": {
         "description": "exisiting vnet"
       }
     },
     "ostype": {
       "type": "string",
+      "defaultValue": "linux",
       "metadata": {
         "description": "exisiting vnet"
       }
     },
     "subnetname": {
       "type": "string",
+      "defaultValue": "dcos-mastersubnet",
       "metadata": {
         "description": "exisiting subnet"
       }
     },
     "location": {
       "type": "string",
+      "defaultValue": "north europe",
       "metadata": {
         "description": "location of the vm"
       }
     },
     "vmname": {
       "type": "string",
+      "defaultValue": "restoredvm",
       "metadata": {
         "description": "name of the vm "
       }
     },
     "nicname": {
       "type": "string",
+      "defaultValue": "myrestor33",
+
       "metadata": {
         "description": "name of the new nic name"
       }
     },
-    "fullpathdatavhd": {
-      "type": "string",
-      "metadata": {
-        "description": "path of data vhd "
-      }
-    },
     "fullpathosvhd": {
       "type": "string",
+      "defaultValue": "https://dcosnewverdisks994.blob.core.windows.net/vhds/jumpbox20161201160638.vhd",
       "metadata": {
-        "description": "path of data vhd "
+        "description": "path of os vhd "
+      }
+    },
+    "fullpathdatadisk": {
+      "type": "string",
+      "defaultValue": "https://dcosnewverdisks994.blob.core.windows.net/vhds/jumpbox-20170202-161224.vhd",
+      "metadata": {
+        "description": "path of os vhd "
       }
     }
   },
   "variables": {
 
 
-    "subnet1Prefix": "10.0.0.0/24",
+    
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetname'))]",
 
     "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnetname'))]"
@@ -103,20 +113,21 @@
       "properties": {
 
         "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]",
+          "vmSize": "[parameters('vmSize')]"
 
-
+        },
+        "storageProfile": {
           "dataDisks": [
             {
-              "name": "datadisk1",
-              "diskSizeGB": "100",
-              "lun": 0,
+              "name": "datadisk1",             
+              "lun": 4,
               "vhd": {
-                "Uri": "[parameters('fullpathdatavhd')]"
+                "Uri": "[parameters('fullpathdatadisk')]"
               },
               "createOption": "Attach"
             }
           ],
+
           "osDisk": {
             "name": "[concat(parameters('vmName'),'-osDisk')]",
             "osType": "[parameters('osType')]",
