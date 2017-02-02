@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -9,6 +9,12 @@
       }
     },
     "vnetname": {
+      "type": "string",
+      "metadata": {
+        "description": "exisiting vnet"
+      }
+    },
+    "ostype": {
       "type": "string",
       "metadata": {
         "description": "exisiting vnet"
@@ -112,26 +118,24 @@
             }
           ],
           "osDisk": {
-            "name": "osdisk",
+            "name": "[concat(parameters('vmName'),'-osDisk')]",
+            "osType": "[parameters('osType')]",
+            "caching": "ReadWrite",
             "vhd": {
-              "fullpathosvhd": {
-                "fullpathosvhd": {
-                  "Uri": "[parameters('fullpathosvhd')]"
-                },
-                "caching": "ReadWrite",
-                "createOption": "Attach"
-              }
+              "uri": "[parameters('fullpathosvhd')]"
             },
-            "networkProfile": {
-              "networkInterfaces": [
-                {
-                  "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
-                }
-              ]
-            }
+            "createOption": "Attach"
           }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
+            }
+          ]
         }
       }
     }
   ]
+
 }
