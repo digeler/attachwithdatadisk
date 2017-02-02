@@ -1,0 +1,137 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "This is the size of your VM"
+      }
+    },
+    "vnetname": {
+      "type": "string",
+      "metadata": {
+        "description": "exisiting vnet"
+      }
+    },
+    "subnetname": {
+      "type": "string",
+      "metadata": {
+        "description": "exisiting subnet"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "location of the vm"
+      }
+    },
+    "vmname": {
+      "type": "string",
+      "metadata": {
+        "description": "name of the vm "
+      }
+    },
+    "nicname": {
+      "type": "string",
+      "metadata": {
+        "description": "name of the new nic name"
+      }
+    },
+    "fullpathdatavhd": {
+      "type": "string",
+      "metadata": {
+        "description": "path of data vhd "
+      }
+    },
+    "fullpathosvhd": {
+      "type": "string",
+      "metadata": {
+        "description": "path of data vhd "
+      }
+    }
+  },
+  "variables": {
+
+
+    "subnet1Prefix": "10.0.0.0/24",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetname'))]",
+
+    "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnetname'))]"
+
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('nicName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+
+
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+
+              "subnet": {
+                "id": "[variables('subnet1Ref')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('vmName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+
+        "[concat('Microsoft.Network/networkInterfaces/', parameters('nicName'))]"
+      ],
+      "properties": {
+
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]",
+
+
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "100",
+              "lun": 0,
+              "vhd": {
+                "Uri": "[parameters('fullpathdatavhd')]"
+              },
+              "createOption": "Attach"
+            }
+          ],
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "fullpathosvhd": {
+                "fullpathosvhd": {
+                  "Uri": "[parameters('fullpathosvhd')]"
+                },
+                "caching": "ReadWrite",
+                "createOption": "Attach"
+              }
+            },
+            "networkProfile": {
+              "networkInterfaces": [
+                {
+                  "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}
